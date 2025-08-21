@@ -45,7 +45,7 @@ class ResidentController extends Controller
         return view('pages.resident.create');
     }
 
-    public function updadate(Request $request, $id)
+    public function update(Request $request, $id)
     {
         // Logic to update an existing resident
         $resident = Resident::findOrFail($id);
@@ -63,13 +63,25 @@ class ResidentController extends Controller
             'status' => ['required', Rule::in(['active', 'moved', 'deceased'])],
         ]);
 
-        Resident::findOrFail($id)->update($request->validated());
+        // Update resident
+        $resident = Resident::findOrFail($id);
+        $resident->update($data);
+
         return redirect('/resident')->with('success', 'Resident updated successfully.');
     }
 
     public function edit($id)
     {
         // Logic to show the form for editing an existing resident
+        $resident = Resident::findOrFail($id);
+        return view('pages.resident.edit', [
+            'resident' => $resident
+        ]);
+    }
+
+    public function show($id)
+    {
+        // Logic to show a specific resident
         $resident = Resident::findOrFail($id);
         return view('pages.resident.edit', [
             'resident' => $resident

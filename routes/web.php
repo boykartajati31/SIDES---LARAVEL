@@ -17,4 +17,4 @@ Route::post('/resident', [App\Http\Controllers\ResidentController::class, 'store
 Route::get('/resident/{id}/edit', [App\Http\Controllers\ResidentController::class, 'edit'])->name('resident.edit');
 Route::put('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'update'])->name('resident.update');
 Route::delete('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'delete'])->name('resident.delete');
-
+Route::get('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'show'])->name('resident.show');
