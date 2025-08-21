@@ -30,38 +30,48 @@
                                         <th>ACTION</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach ($residents as $resident)
+                                @if (count($residents) < 1)
+                                    <tbody>
                                         <tr>
-                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td>{{ $resident->nik }}</td>
-                                            <td>{{ $resident->name }}</td>
-                                            <td>{{ $resident->gender }}</td>
-                                            <td>{{ $resident->birth_place }}</td>
-                                            <td>{{ $resident->birth_date }}</td>
-                                            <td>{{ $resident->address }}</td>
-                                            <td>{{ $resident->religion }}</td>
-                                            <td>{{ $resident->marital_status }}</td>
-                                            <td>{{ $resident->occupation }}</td>
-                                            <td>{{ $resident->phone }}</td>
-                                            <td>{{ $resident->status }}</td>
-
-                                            <td>
-                                                <div class="text-wrap d-flex justify-content-center gap-3">
-                                                    <a href="/resident/{id}" class="btn btn-warning btn-sm d-inline-block mr">
-                                                        <i class="fas fa-pen">
-                                                        </i>
-                                                    </a>
-                                                    <a href="/resident/{id}" class="btn btn-danger btn-sm">
-                                                        <i class="fas fa-trash">
-                                                        </i>
-                                                    </a>
-
-                                                </div>
+                                            <td colspan="13" class="text-center">
+                                                <span>Tidak Ada Data Penduduk</span>
                                             </td>
                                         </tr>
-                                    @endforeach
-                                </tbody>
+                                    </tbody>
+                                @else
+                                    <tbody>
+                                        @foreach ($residents as $resident)
+                                            <tr>
+                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td>{{ $resident->nik }}</td>
+                                                <td>{{ $resident->name }}</td>
+                                                <td>{{ $resident->gender }}</td>
+                                                <td>{{ $resident->birth_place  }}</td>
+                                                <td>{{ $resident->birth_date }}</td>
+                                                <td>{{ $resident->address }}</td>
+                                                <td>{{ $resident->religion }}</td>
+                                                <td>{{ $resident->marital_status }}</td>
+                                                <td>{{ $resident->occupation }}</td>
+                                                <td>{{ $resident->phone }}</td>
+                                                <td>{{ $resident->status }}</td>
+
+                                                <td>
+                                                    <div class="text-wrap d-flex justify-content-center gap-5">
+                                                        <a href="/resident/{{ $resident->id }}" class="btn btn-warning btn-sm d-inline-block mr-2">
+                                                            <i class="fas fa-pen">
+                                                            </i>
+                                                        </a>
+                                                        <a href="/resident/{{ $resident->id }}" class="btn btn-danger btn-sm">
+                                                            <i class="fas fa-trash">
+                                                            </i>
+                                                        </a>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                @endif
                             </table>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Resident;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
 class ResidentController extends Controller
@@ -34,7 +35,7 @@ class ResidentController extends Controller
             'status' => ['required', Rule::in(['active', 'moved', ' deceased'])],
         ]);
 
-        Resident::create($request->validated());
+        Resident::create($data);
         return redirect('/resident')->with('success', 'Resident created successfully.');
     }
 
