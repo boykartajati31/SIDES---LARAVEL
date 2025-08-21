@@ -61,14 +61,15 @@
                                                             <i class="fas fa-pen">
                                                             </i>
                                                         </a>
-                                                        <a href="/resident/{{ $resident->id }}" class="btn btn-danger btn-sm">
+                                                        <button type="button"  class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmationDelete-{{ $resident->id }}">
                                                             <i class="fas fa-trash">
                                                             </i>
-                                                        </a>
+                                                        </button>
 
                                                     </div>
                                                 </td>
                                             </tr>
+                                        @include('pages.resident.confirmation-delete', ['item' => $resident])
                                         @endforeach
                                     </tbody>
                                 @endif
