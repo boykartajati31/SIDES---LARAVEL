@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ResidentController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Define the routes for authentication and resident management
+Route::get('/', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'authenticate']);
 
 Route::get('/dashboard', function () {
     return view('pages.dashboard');
@@ -18,3 +20,4 @@ Route::get('/resident/{id}/edit', [App\Http\Controllers\ResidentController::clas
 Route::put('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'update'])->name('resident.update');
 Route::delete('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'destroy'])->name('resident.destroy');
 Route::get('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'show'])->name('resident.show');
+
