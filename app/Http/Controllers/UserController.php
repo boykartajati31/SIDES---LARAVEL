@@ -20,15 +20,28 @@ class UserController extends Controller
         ]);
     }
 
-
     public function account_approval(Request $request, $userId)
     {
         $for = $request->input('for');
 
         $user = User::findOrFail($userId);
-        $user->status = $for == 'approve' ? 'approved' : 'rejected';
+        $user->status = ($for == 'approve' || $for == 'activate') ? 'approved' : 'rejected';
         $user->save();
 
+        if($for == 'activate') {
+            return back()->with('success','Success Activate account');
+        } else if ( $for == 'deactivate' )
+            return back()->with('success','Success Non-Activate account');
+
         return back()->with('success', $for == 'approve' ? 'Success approvad account' : 'Success rejected account');
+    }
+
+    public function account_list_view()
+    {
+        $users = User::where('role_id', 2)->where('status', '!=', 'submitted')->get();
+
+        return view('pages.account-list.index', [
+            'users' => $users,
+        ]);
     }
 }

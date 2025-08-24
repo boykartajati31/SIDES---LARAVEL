@@ -12,6 +12,11 @@
                             'icon' => 'fas fa-fw fa-user',
                         ],
                         (object)[
+                            'title' => 'Daftar Akun',
+                            'path' => 'account-list',
+                            'icon' => 'fas fa-fw fa-users',
+                        ],
+                        (object)[
                             'title' => 'Permintaan Akun',
                             'path' => 'account-requests',
                             'icon' => 'fas fa-fw fa-users-cog',
@@ -31,7 +36,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dashboard">
                 <div class="sidebar-brand-icon rotate-n-15">
                     {{-- <i class="fas fa-laugh-wink"></i> --}}
                 </div>
@@ -49,6 +54,8 @@
             </li> --}}
 
             <!-- Nav Item - Pages Collapse Menu -->
+            @auth
+
             @foreach ($menus[auth()->user()->role_id] as $menu)
                 <li class="nav-item {{ request()->is($menu->path . '*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url($menu->path) }}">
@@ -57,6 +64,8 @@
                     </a>
                 </li>
             @endforeach
+
+            @endauth
 
             {{-- <li class="nav-item {{ request()->is('resident*') ? 'active' : '' }}">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"

@@ -18,8 +18,14 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // Check if the user is authenticated
+        if (!Auth::check()) {
+            return redirect('/')->withErrors([
+                'email' => 'SIlakan LOGIN terlebih dahulu',
+            ]);
+        }
+
         $roleName = Role::find(Auth::user()->role_id)->name;
-        if (!auth()->check() || !in_array($roleName, $roles)) {
+        if (!in_array($roleName, $roles)) {
             return back()->with('error', 'You must be logged in to access this page.');
         }
         return $next($request);
