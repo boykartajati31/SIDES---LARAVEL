@@ -26,23 +26,38 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ],[
+            'email.required' => 'Email is required',
+            'password.required' => 'Password is required',
         ]);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
             if (Auth::user()->status == 'submitted') {
-                return back()->with('error', 'Your account is not approved yet. Please contact the administrator.');
+                $this->_logout($request);
+                return back()->withErrors(['submitted' =>'Your account is not approved yet. Please contact the administrator.']);
             }else if (Auth::user()->status == 'rejected') {
-                return back()->with('error', 'Your account has been rejected. Please contact the administrator.');
+                $this->_logout($request);
+                return back()->withErrors(['rejected' => 'Your account has been rejected. Please contact the administrator.']);
             }
 
             return redirect()->intended('dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'error' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
+    }
+
+    public function _logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
     }
 
     public function logout(Request $request)
@@ -51,11 +66,7 @@ class AuthController extends Controller
             return redirect('/')->with('error', 'You are not logged in.');
         }
 
-        Auth::logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
+        $this->_logout($request);
 
         return redirect('/');
     }
