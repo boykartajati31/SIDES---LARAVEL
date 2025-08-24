@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResidentController;
+use App\Http\Controllers\UserController;
+
 
 // Define the routes for authentication and resident management
 
@@ -25,4 +27,6 @@ Route::post('register', [AuthController::class, 'register']);
     Route::put('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'update'])->middleware('role:admin');
     Route::delete('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'destroy'])->middleware('role:admin');
     Route::get('/resident/{id}', [App\Http\Controllers\ResidentController::class, 'show'])->middleware('role:admin');
+    Route::get('/account-requests', [App\Http\Controllers\UserController::class, 'account_request_view'])->middleware('role:admin');
+    Route::post('/account-requests/approval/{id}', [App\Http\Controllers\UserController::class, 'account_approval'])->middleware('role:admin');
 

@@ -5,11 +5,16 @@
                             'title' => 'Dashboard',
                             'path' => 'dashboard',
                             'icon' => 'fas fa-fw fa-tachometer-alt',
-                     ],
+                        ],
                         (object)[
                             'title' => 'Penduduk',
                             'path' => 'resident',
                             'icon' => 'fas fa-fw fa-user',
+                        ],
+                        (object)[
+                            'title' => 'Permintaan Akun',
+                            'path' => 'account-requests',
+                            'icon' => 'fas fa-fw fa-users-cog',
                         ],
 
         ],

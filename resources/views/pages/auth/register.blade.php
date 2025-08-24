@@ -19,6 +19,7 @@
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('template/temp/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
@@ -29,6 +30,15 @@
 @endif
 
 <body class="bg-gradient-primary">
+    @if ($errors->any())
+        <script>
+            Swal.fire({
+            title: "Terjadi Kesalahan!",
+            text: "@foreach ($errors->all() as $error) {{ $error }} @if (!$loop->last) ,  @endif @endforeach",
+            icon: "error"
+            });
+        </script>
+    @endif
 
     <div class="container">
 
@@ -74,7 +84,7 @@
                                         </form>
                                     <hr>
                                     <div class="text-center">
-                                        <a class="small" href="/">Login</a>
+                                        <a class="small" href="/" >Login</a>
                                     </div>
                                 </div>
                             </div>

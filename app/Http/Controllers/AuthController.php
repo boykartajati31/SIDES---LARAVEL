@@ -92,6 +92,12 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        if (User::where('email', $request->input('email'))->exists()) {
+            return back()->withErrors(['email' => 'Email already registered.'])->withInput();
+        }else if (strlen($request->input('password')) < 6 ) {
+            return back()->withErrors(['password' => 'Password must be at least 6 characters.'])->withInput();
+        }
+
         $user = new User();
         $user->name = $request->input('name');
         $user->email = $request->input('email');
