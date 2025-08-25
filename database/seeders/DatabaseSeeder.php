@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             // Add other seeders here as needed
             UserSeeder::class,
+            ComplaintSeeder::class,
         ]);
     }
 
