@@ -40,36 +40,42 @@
                                     </tbody>
                                 @else
                                     <tbody>
-                                        @foreach ($residents as $resident)
+                                        @foreach ($residents as $item)
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                                <td>{{ $resident->nik }}</td>
-                                                <td>{{ $resident->name }}</td>
-                                                <td>{{ $resident->gender }}</td>
-                                                <td>{{ $resident->birth_place  }}</td>
-                                                <td>{{ $resident->birth_date }}</td>
-                                                <td>{{ $resident->address }}</td>
-                                                <td>{{ $resident->religion }}</td>
-                                                <td>{{ $resident->marital_status }}</td>
-                                                <td>{{ $resident->occupation }}</td>
-                                                <td>{{ $resident->phone }}</td>
-                                                <td>{{ $resident->status }}</td>
+                                                <td>{{ $item->nik }}</td>
+                                                <td>{{ $item->name }}</td>
+                                                <td>{{ $item->gender }}</td>
+                                                <td>{{ $item->birth_place  }}</td>
+                                                <td>{{ $item->birth_date }}</td>
+                                                <td>{{ $item->address }}</td>
+                                                <td>{{ $item->religion }}</td>
+                                                <td>{{ $item->marital_status }}</td>
+                                                <td>{{ $item->occupation }}</td>
+                                                <td>{{ $item->phone }}</td>
+                                                <td>{{ $item->status }}</td>
 
                                                 <td>
                                                     <div class="text-wrap d-flex justify-content-center gap-5">
-                                                        <a href="/resident/{{ $resident->id }}" class="btn btn-warning btn-sm d-inline-block mr-2">
+                                                        <a href="/resident/{{ $item->id }}" class="btn btn-warning btn-sm d-inline-block mr-2">
                                                             <i class="fas fa-pen">
                                                             </i>
                                                         </a>
-                                                        <button type="button"  class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmationDelete-{{ $resident->id }}">
+                                                        <button type="button"  class="btn btn-danger btn-sm mr-2" data-bs-toggle="modal" data-bs-target="#confirmationDelete-{{ $item->id }}">
                                                             <i class="fas fa-trash">
                                                             </i>
                                                         </button>
 
+                                                        @if (!is_null($item->user_id))
+                                                            <button type="button"  class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailAccount-{{ $item->id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
-                                        @include('pages.resident.confirmation-delete', ['item' => $resident])
+                                        @include('pages.resident.confirmation-delete')
+                                        @include('pages.resident.detailAccount')
                                         @endforeach
                                     </tbody>
                                 @endif

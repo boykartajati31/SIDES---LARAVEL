@@ -12,7 +12,7 @@ class ResidentController extends Controller
     public function index()
     {
         // Logic to retrieve and display residents
-        $residents = Resident::all();
+        $residents = Resident::with('user')->get();
         return view('pages.resident.index', [
             'residents' => $residents
         ]);

@@ -10,4 +10,9 @@ class Resident extends Model
     protected $table = 'residents';
 
     protected $guarded = [];
+
+    public function user ()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
