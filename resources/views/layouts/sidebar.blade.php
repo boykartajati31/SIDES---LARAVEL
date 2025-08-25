@@ -22,12 +22,19 @@
                             'icon' => 'fas fa-fw fa-users-cog',
                         ],
 
-        ],
+                    ],
+
                     2 => [
                         (object)[
                             'title' => 'dashboard',
                             'path' => 'dashboard',
                             'icon' => 'fas fa-fw fa-tachometer-alt',
+                        ],
+
+                        (object)[
+                            'title' => 'pengaduan',
+                            'path' => 'complaint',
+                            'icon' => 'fas fa-fw fa-scroll',
                         ],
                     ],
                 ];
