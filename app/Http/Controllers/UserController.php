@@ -15,7 +15,7 @@ class UserController extends Controller
     public function account_request_view()
     {
         // Mengambil semua user dengan status 'submitted'
-        $users = User::where('status', 'submitted')->get();
+        $users = User::where('status', 'submitted')->paginate(1);
         $residents = Resident::where('user_id', null)->get();
 
         // Mengirim data user ke view
@@ -56,7 +56,7 @@ class UserController extends Controller
 
     public function account_list_view()
     {
-        $users = User::where('role_id', 2)->where('status', '!=', 'submitted')->get();
+        $users = User::where('role_id', 2)->where('status', '!=', 'submitted')->paginate(1);
 
         return view('pages.account-list.index', [
             'users' => $users,

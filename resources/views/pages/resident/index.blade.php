@@ -42,7 +42,7 @@
                                     <tbody>
                                         @foreach ($residents as $item)
                                             <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td class="text-center">{{ $loop->iteration + $residents->firstItem() - 1  }}</td>
                                                 <td>{{ $item->nik }}</td>
                                                 <td>{{ $item->name }}</td>
                                                 <td>{{ $item->gender }}</td>
@@ -75,12 +75,19 @@
                                                 </td>
                                             </tr>
                                         @include('pages.resident.confirmation-delete')
-                                        @include('pages.resident.detailAccount')
+                                            @if (!is_null($item->user_id))
+                                                @include('pages.resident.detailAccount')
+                                            @endif
                                         @endforeach
                                     </tbody>
                                 @endif
                             </table>
                     </div>
+                    @if ($residents->lastPage() > 1)
+                        <div class="card-footer">
+                            {{ $residents->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
