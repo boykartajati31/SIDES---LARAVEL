@@ -55,9 +55,9 @@ class ComplaintController extends Controller
             if (Auth::user()->role !== 'admin') {
                 $resident = Resident::where('user_id', Auth::id())->first();
 
-                if (!$resident || $complaint->resident_id !== $resident->id) {
-                    abort(403, 'Unauthorized action.');
-                }
+                // if (!$resident || $complaint->resident_id !== $resident->id) {
+                //     abort(403, 'Unauthorized action.');
+                // }
             }
 
             $complaint->title = $request->input('title');
@@ -92,32 +92,27 @@ class ComplaintController extends Controller
         ]);
 
         try {
-            // GUNAKAN QUERY MANUAL JIKA RELASI TIDAK BEKERJA
             $resident = Resident::where('user_id', Auth::id())->first();
-
             if (!$resident) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Data resident tidak ditemukan. Silakan hubungi administrator.');
+                return redirect()->back()->withInput()->with('error', 'Data resident tidak ditemukan.');
             }
 
             $complaint = new Complaint();
-            $complaint->resident_id = $resident->id;
-            $complaint->title = $request->input('title');
-            $complaint->content = $request->input('content');
+            $complaint->resident_id      = $resident->id;
+            $complaint->title            = $request->input('title');
+            $complaint->content          = $request->input('content');
 
             if ($request->hasFile('photo_proof')) {
-                $filePath = $request->file('photo_proof')->store('public/uploads');
-                $complaint->photo_proof = $filePath;
+                // Simpan di folder 'public/uploads'
+                $filePath = $request->file('photo_proof')->store('uploads', 'public');
+                $complaint->photo_proof = 'uploads/'. basename($filePath);
             }
 
             $complaint->save();
             return redirect('/complaint')->with('success', 'Berhasil membuat Aduan');
 
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: '. $e->getMessage());
         }
     }
 

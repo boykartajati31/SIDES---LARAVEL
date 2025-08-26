@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container-fluid">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">ADUAN</h1>
+            <h1 class="h3 mb-0 text-gray-800">LIST ADUAN</h1>
             <a href="/complaint/create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-            class="fas fa-plus fa-sm text-white-50"></i> BUAT ADUAN </a>
+            class="fas fa-plus fa-sm text-white-50"></i> TAMBAH ADUAN </a>
         </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="card shadow">
-                    <div class="card-body py-3">
-                        <h6 class="m-px font-weight-bold text-primary">List Aduan</h6>
-                            <table class="table table-bordered table-hovered table-responsive">
+            <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Daftar Aduan Masyarakat</h6>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
                                         <th class="text-center">NO</th>
@@ -38,15 +38,28 @@
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration + $complaints->firstItem() - 1  }}</td>
                                                 <td>{{ $item->title }}</td>
-                                                <td>{!! wordwrap($item->content, 50, "<br>\n") !!}</td>
-                                                <td>{{ $item->status_label }}</td>
+                                                <td>{{ Str::limit($item->content, 100) }}</td>
+                                                {{-- <td>{{ $item->status_label }}</td> --}}
                                                 <td>
-                                                    @if (isset($item->photo_proof))
-                                                        <a href="{{ $item->photo_proof }}">
-                                                            <img src="{{ $item->photo_proof }}" alt="foto_bukti" style="max-width: 300px;">
-                                                        </a>
+                                                    <span class="badge badge-{{ $item->status_label == 'Baru' ? 'primary' : ($item->status_label == 'Proses' ? 'warning' : 'success') }}">
+                                                        {{ $item->status_label }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                     @if($item->photo_proof)
+                                                        @if(Storage::disk('public')->exists($item->photo_proof))
+                                                            <img src="{{ asset('storage/' . $item->photo_proof) }}"
+                                                                alt="Foto Bukti"
+                                                                class="img-thumbnail"
+                                                                style="width: 80px; height: 60px; object-fit: cover;"
+                                                                data-toggle="modal"
+                                                                data-target="#imageModal{{ $item->id }}"
+                                                                style="cursor:pointer;">
+                                                        @else
+                                                            <span class="text-muted">File tidak ditemukan</span>
+                                                        @endif
                                                     @else
-                                                        Tidak Ada
+                                                        <span class="text-muted">Tidak ada foto</span>
                                                     @endif
                                                 </td>
                                                 <td>{{ $item->report_date_label }}</td>
@@ -64,6 +77,28 @@
                                                     </div>
                                                 </td>
                                             </tr>
+
+                                            <!-- Modal untuk gambar -->
+                                            @if($item->photo_proof && Storage::disk('public')->exists($item->photo_proof))
+                                            <div class="modal fade" id="imageModal{{ $item->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Foto Bukti - {{ $item->title }}</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body text-center">
+                                                            <img src="{{ asset('storage/' . $item->photo_proof) }}"
+                                                                alt="Foto Bukti"
+                                                                class="img-fluid">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
+
                                         @include('pages.complaint.confirmation-delete')
                                             @if (!is_null($item->user_id))
                                                 @include('pages.complaint.detailAccount')
@@ -78,7 +113,52 @@
                             {{ $complaints->links('pagination::bootstrap-5') }}
                         </div>
                     @endif
-                </div>
             </div>
-        </div>
+</div>
+
 @endsection
+
+@section('styles')
+<style>
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.6em;
+    }
+
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+
+    .img-thumbnail {
+        transition: transform 0.2s;
+    }
+
+    .img-thumbnail:hover {
+        transform: scale(1.1);
+    }
+</style>
+@endsection
+
+@section('scripts')
+<script>
+    // Script untuk modal gambar
+    $(document).ready(function() {
+        $('.img-thumbnail').click(function() {
+            var modalId = $(this).data('target');
+            $(modalId).modal('show');
+        });
+    });
+</script>
+@endsection
+
