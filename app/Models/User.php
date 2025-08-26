@@ -48,6 +48,11 @@ class User extends Authenticatable
 
     public function residents()
     {
-        return $this->hasMany(Resident::class);
+        return $this->hasOne(Resident::class);
+    }
+
+    public function complaints()
+    {
+    return $this->hasManyThrough(Complaint::class, Resident::class);
     }
 }

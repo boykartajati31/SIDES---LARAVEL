@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->string('content');
             $table->enum('status', ['new', 'processing', 'completed'])->default('new');
             $table->string('photo_proof')->nullable();
-            $table->timestamp('report_date')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamps('report_date')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamps();
 
             $table->foreign('resident_id')->references('id')->on('residents')->onDelete('cascade');
