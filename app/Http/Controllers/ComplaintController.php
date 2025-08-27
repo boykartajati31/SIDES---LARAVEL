@@ -8,26 +8,50 @@ use App\Models\Resident;
 use App\Models\Complaint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ComplaintController extends Controller
 {
     //
     public function index()
     {
-        // Menggunakan eager loading dan relationship
-    $complaints = Auth::user()->complaints()->paginate(2);
-    return view('pages.complaint.index', compact('complaints'));
-    }
+        // Debugging: Cek role user
+        // dd(Auth::user()->role_id, Auth::user()->resident);
 
-    public function create()
-    {
-        return view('pages.complaint.create');
+        // Untuk admin (role_id = 1) tampilkan semua aduan
+        if (Auth::user()->role_id == 1) {
+            $complaints = Complaint::with(['resident.user'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
+        // Untuk user biasa (role_id = 2) tampilkan hanya aduannya sendiri
+        else {
+            // Cek apakah user memiliki data resident
+            $resident = Resident::where('user_id', Auth::id())->first();
+
+            if (!$resident) {
+                // Jika tidak ada data resident, tampilkan pesan error tanpa redirect
+                $complaints = collect(); // collection kosong
+                return view('pages.complaint.index', compact('complaints'))
+                    ->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
+            }
+
+            $complaints = Complaint::where('resident_id', $resident->id)
+                ->with('resident.user')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
+        return view('pages.complaint.index', compact('complaints'));
     }
 
 
     public function show($id)
     {
         // Logic to show a specific resident
+         $resident = Resident::where('user_id', Auth::id())->first();
+            if (!$resident) {
+                return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
+            }
         $complaint = Complaint::findOrFail($id);
         return view('pages.complaint.edit', [
             'complaint' => $complaint
@@ -36,6 +60,11 @@ class ComplaintController extends Controller
 
     public function edit($id)
     {
+        $resident = Resident::where('user_id', Auth::id())->first();
+        if (!$resident) {
+            return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
+        }
+
         $complaint = Complaint::findOrFail($id);
         return view('pages.complaint.create');
     }
@@ -48,18 +77,16 @@ class ComplaintController extends Controller
             'photo_proof' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
         ]);
 
-        try {
-            $complaint = Complaint::findOrFail($id);
-
-            // Authorization check - hanya pemilik atau admin yang bisa update
-            if (Auth::user()->role !== 'admin') {
-                $resident = Resident::where('user_id', Auth::id())->first();
-
-                // if (!$resident || $complaint->resident_id !== $resident->id) {
-                //     abort(403, 'Unauthorized action.');
-                // }
+            $resident = Resident::where('user_id', Auth::id())->first();
+            if (!$resident) {
+            return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
             }
 
+        try {
+            $complaint = Complaint::findOrFail($id);
+            if ($complaint->status != 'new') {
+                return redirect('/complaint')->with('error', 'Gagal mengubah Status aduan, Status anda saat ini adalah "'. $complaint->status_label .'"');
+            }
             $complaint->title = $request->input('title');
             $complaint->content = $request->input('content');
 
@@ -78,10 +105,46 @@ class ComplaintController extends Controller
         }
         catch (\Exception $e) {
             return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            ->withInput()
+            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function update_status(Request $request, $id )
+    {
+        $request->validate([
+            'status' => ['required', Rule::in(['new', 'processing', 'completed'])],
+        ]);
+
+            $resident = Resident::where('user_id', Auth::id())->first();
+            if (Auth::user()->role_id == 2 && !$resident ) {
+            return redirect('/complaint')->with('Success', 'Berhasil Mengubah Status.');
+            }
+
+        try {
+            $complaint = Complaint::findOrFail($id);
+            $complaint->status = $request->input('status');
+            $complaint->save();
+            return redirect('/complaint')->with('success', 'Berhasil mengubah Status');
+        }
+        catch (\Exception $e) {
+            return redirect()->back()
+            ->withInput()
+            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
+    public function create()
+    {
+        $resident = Resident::where('user_id', Auth::id())->first();
+        if (!$resident) {
+            return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
+        }
+
+        return view('pages.complaint.create');
+    }
+
 
     public function store(Request $request )
     {
@@ -94,7 +157,7 @@ class ComplaintController extends Controller
         try {
             $resident = Resident::where('user_id', Auth::id())->first();
             if (!$resident) {
-                return redirect()->back()->withInput()->with('error', 'Data resident tidak ditemukan.');
+                return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
             }
 
             $complaint = new Complaint();
@@ -119,19 +182,17 @@ class ComplaintController extends Controller
 
     public function destroy($id)
     {
-            try {
+        try {
         // PERBAIKI: findOrFile -> findOrFail
-        $complaint = Complaint::findOrFail($id);
-
-        // Tambahkan authorization check - hanya pemilik atau admin yang bisa hapus
-        if (Auth::user()->role !== 'admin') {
-            $resident = Resident::where('user_id', Auth::id())->first();
-
-            if (!$resident || $complaint->resident_id !== $resident->id) {
-                abort(403, 'Unauthorized action.');
+         $resident = Resident::where('user_id', Auth::id())->first();
+            if (!$resident) {
+                return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
             }
-        }
 
+        $complaint = Complaint::findOrFail($id);
+        if ($complaint->status != 'new') {
+            return redirect('/complaint')->with('error', 'Gagal menghapus Status aduan, Status anda saat ini adalah "'. $complaint->status_label .'"');
+        }
         // Hapus file foto jika ada
         if ($complaint->photo_proof && Storage::disk('public')->exists($complaint->photo_proof)) {
             Storage::disk('public')->delete($complaint->photo_proof);

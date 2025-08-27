@@ -3,10 +3,33 @@
 @section('content')
 <div class="container-fluid">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">LIST ADUAN</h1>
-            <a href="/complaint/create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-            class="fas fa-plus fa-sm text-white-50"></i> TAMBAH ADUAN </a>
+            <h1 class="h3 mb-0 text-gray-800">{{ auth()->user()->role_id == 1 ? 'ADUAN WARGA' : 'ADUAN' }}</h1>
+                @if(Auth::user()->role != 'admin')
+                    <a href="/complaint/create"
+                    class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> TAMBAH ADUAN
+                    </a>
+                @endif
         </div>
+
+        @if (session('error'))
+            <script>
+                Swal.fire({
+                title: "Terjadi Kesalahan ..!",
+                text: "{{ session()->get('error') }}",
+                icon: "error"
+                });
+            </script>
+        @elseif (session('success'))
+            <script>
+                Swal.fire({
+                title: "Sukses",
+                text: "{{ session()->get('success') }}",
+                icon: "success"
+                });
+            </script>
+        @endif
+
             <div class="card shadow mb-4">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">Daftar Aduan Masyarakat</h6>
@@ -43,7 +66,7 @@
                                                 <td>
                                                     <span class="badge badge-{{ $item->status_label == 'Baru' ? 'primary' : ($item->status_label == 'Proses' ? 'warning' : 'success') }}">
                                                         {{ $item->status_label }}
-                                                    </span>
+                                                </span>
                                                 </td>
                                                 <td>
                                                      @if($item->photo_proof)
@@ -63,18 +86,37 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $item->report_date_label }}</td>
-
                                                 <td>
-                                                    <div class="text-wrap d-flex justify-content-center gap-5">
-                                                        <a href="/complaint/{{ $item->id }}" class="btn btn-warning btn-sm d-inline-block mr-2">
-                                                            <i class="fas fa-pen">
-                                                            </i>
-                                                        </a>
-                                                        <button type="button"  class="btn btn-danger btn-sm mr-2" data-bs-toggle="modal" data-bs-target="#confirmationDelete-{{ $item->id }}">
-                                                            <i class="fas fa-trash">
-                                                            </i>
-                                                        </button>
-                                                    </div>
+                                                    @if (auth()->check() && auth()->user()->role_id == 2 && strtolower($item->status) == 'new')
+                                                        <div class="text-wrap d-flex justify-content-center gap-5">
+                                                            <a href="/complaint/{{ $item->id }}" class="btn btn-warning btn-sm d-inline-block mr-2">
+                                                                <i class="fas fa-pen"></i>
+                                                            </a>
+                                                            <button type="button" class="btn btn-danger btn-sm mr-2" data-bs-toggle="modal" data-bs-target="#confirmationDelete-{{ $item->id }}">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    @elseif (auth()->user()->role_id == 1)
+                                                        <form id="formChangeStatus-{{ $item->id }}" action="/complaint/update-status/{{ $item->id }}" method="POST">
+                                                            @csrf
+                                                            @method('POST')
+                                                            <div class="form-group">
+                                                                <select name="status" class="form-control" style="min-width: 150px"
+                                                                        onchange="document.getElementById('formChangeStatus-{{ $item->id }}').submit()">
+                                                                    @foreach ([
+                                                                        ['label' => 'Baru', 'value' => 'new'],
+                                                                        ['label' => 'Sedang di Proses', 'value' => 'processing'],
+                                                                        ['label' => 'Selesai', 'value' => 'completed'],
+                                                                    ] as $status)
+                                                                        <option value="{{ $status['value'] }}"
+                                                                                @selected(strtolower($item->status) == strtolower($status['value']))>
+                                                                            {{ $status['label'] }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </form>
+                                                    @endif
                                                 </td>
                                             </tr>
 

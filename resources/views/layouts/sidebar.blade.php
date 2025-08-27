@@ -22,6 +22,12 @@
                             'icon' => 'fas fa-fw fa-users-cog',
                         ],
 
+                        (object)[
+                            'title' => 'Aduan Warga',
+                            'path' => 'complaint',
+                            'icon' => 'fas fa-fw fa-scroll',
+                        ],
+
                     ],
 
                     2 => [

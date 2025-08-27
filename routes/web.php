@@ -46,4 +46,5 @@ Route::post('register', [AuthController::class, 'register']);
     Route::put('/complaint/{id}', [App\Http\Controllers\ComplaintController::class, 'update'])->middleware('role:user');
     Route::delete('/complaint/{id}', [App\Http\Controllers\ComplaintController::class, 'destroy'])->middleware('role:user');
     Route::get('/complaint/{id}', [App\Http\Controllers\ComplaintController::class, 'show'])->middleware('role:user');
+    Route::post('/complaint/update-status/{id}', [App\Http\Controllers\ComplaintController::class, 'update_status'])->middleware('role:admin');
     Route::resource('complaint', ComplaintController::class)->middleware('auth');
