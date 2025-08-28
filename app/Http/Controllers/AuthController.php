@@ -90,6 +90,11 @@ class AuthController extends Controller
             'name' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'name.required'     =>  'Nama Lengkap harus diisi',
+            'email.required'     =>  'Email Lengkap harus diisi',
+            'email.email'     =>  'Email tidak Valid',
+            'password.required'     =>  'Password harus diisi',
         ]);
 
         if (User::where('email', $request->input('email'))->exists()) {
