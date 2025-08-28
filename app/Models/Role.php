@@ -8,4 +8,7 @@ class Role extends Model
 {
     //
     protected $table = 'roles';
+
+    public const role_admin = 1;
+    public const role_user  =2;
 }

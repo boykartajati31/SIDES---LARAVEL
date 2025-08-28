@@ -9,6 +9,7 @@ use App\Models\Complaint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Notifications\ComplaintStatusChanged;
 
 class ComplaintController extends Controller
 {
@@ -19,7 +20,7 @@ class ComplaintController extends Controller
         // dd(Auth::user()->role_id, Auth::user()->resident);
 
         // Untuk admin (role_id = 1) tampilkan semua aduan
-        if (Auth::user()->role_id == 1) {
+        if (Auth::user()->role_id == \App\Models\Role::role_admin) {
             $complaints = Complaint::with(['resident.user'])
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
@@ -114,14 +115,20 @@ class ComplaintController extends Controller
         ]);
 
             $resident = Resident::where('user_id', Auth::id())->first();
-            if (Auth::user()->role_id == 2 && !$resident ) {
+            if (Auth::user()->role_id == \App\Models\Role::role_user && !$resident ) {
             return redirect('/complaint')->with('Success', 'Berhasil Mengubah Status.');
             }
 
         try {
             $complaint = Complaint::findOrFail($id);
+            $oldStatus = $complaint->status_label;
             $complaint->status = $request->input('status');
             $complaint->save();
+
+            $newStatus = $complaint->status_label;
+
+            User::where('id', $complaint->resident->user_id)->firstOrFail()->notify(new ComplaintStatusChanged($complaint, $oldStatus, $newStatus));
+
             return redirect('/complaint')->with('success', 'Berhasil mengubah Status');
         }
         catch (\Exception $e) {

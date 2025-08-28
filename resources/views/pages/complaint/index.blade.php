@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">{{ auth()->user()->role_id == 1 ? 'ADUAN WARGA' : 'ADUAN' }}</h1>
+            <h1 class="h3 mb-0 text-gray-800">{{ auth()->user()->role_id == \App\Models\Role::role_admin ? 'ADUAN WARGA' : 'ADUAN' }}</h1>
                 @if(Auth::user()->role != 'admin')
                     <a href="/complaint/create"
                     class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
@@ -39,6 +39,9 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">NO</th>
+                                        @if (auth()->user()->role_id == \App\Models\Role::role_admin)
+                                            <th>NAMA PENDUDUK</th>
+                                        @endif
                                         <th>JUDUL</th>
                                         <th>ISI ADUAN</th>
                                         <th>STATUS</th>
@@ -60,11 +63,14 @@
                                         @foreach ($complaints as $item)
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration + $complaints->firstItem() - 1  }}</td>
+                                                @if (auth()->user()->role_id == \App\Models\Role::role_admin)
+                                                    <td>{{ $item->resident->name }}</td>
+                                                @endif
                                                 <td>{{ $item->title }}</td>
                                                 <td>{{ Str::limit($item->content, 100) }}</td>
                                                 {{-- <td>{{ $item->status_label }}</td> --}}
                                                 <td>
-                                                    <span class="badge badge-{{ $item->status_label == 'Baru' ? 'primary' : ($item->status_label == 'Proses' ? 'warning' : 'success') }}">
+                                                      <span class="badge badge-{{ $item->status_label == 'Baru' ? 'info' : ($item->status_label == 'Sedang di Proses' ? 'warning' : ($item->status_label == 'Selesai' ? 'success' : 'secondary')) }}">
                                                         {{ $item->status_label }}
                                                 </span>
                                                 </td>
@@ -87,7 +93,7 @@
                                                 </td>
                                                 <td>{{ $item->report_date_label }}</td>
                                                 <td>
-                                                    @if (auth()->check() && auth()->user()->role_id == 2 && strtolower($item->status) == 'new')
+                                                    @if (auth()->check() && auth()->user()->role_id == \App\Models\Role::role_user && strtolower($item->status) == 'new')
                                                         <div class="text-wrap d-flex justify-content-center gap-5">
                                                             <a href="/complaint/{{ $item->id }}" class="btn btn-warning btn-sm d-inline-block mr-2">
                                                                 <i class="fas fa-pen"></i>
@@ -96,7 +102,7 @@
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         </div>
-                                                    @elseif (auth()->user()->role_id == 1)
+                                                    @elseif (auth()->user()->role_id == \App\Models\Role::role_admin)
                                                         <form id="formChangeStatus-{{ $item->id }}" action="/complaint/update-status/{{ $item->id }}" method="POST">
                                                             @csrf
                                                             @method('POST')

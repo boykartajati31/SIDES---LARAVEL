@@ -21,6 +21,23 @@ Route::post('register', [AuthController::class, 'register']);
         return view('pages.dashboard');
     })->middleware('role:admin,user');
 
+        Route::get('/notifications', function () {
+            return view('pages.notifications');
+        });
+        Route::post('/notification/{id}/read', function ($id) {
+        $notification = \Illuminate\Support\Facades\DB::table('notifications')->where('id', $id);
+        $notification->update([
+            'read_at'   => \Illuminate\Support\Facades\DB::raw('CURRENT_TIMESTAMP'),
+        ]);
+
+        $dataArray = json_decode($notification->firstOrFail()->data, true);
+        if (isset($dataArray['complaint_id'])) {
+            return redirect('/complaint');
+        }
+            return back();
+
+    })->middleware('role:admin,user');
+
     Route::get('/resident', [App\Http\Controllers\ResidentController::class, 'index'])->middleware('role:admin');
     Route::get('/resident/create', [App\Http\Controllers\ResidentController::class, 'create'])->middleware('role:admin');
     Route::post('/resident', [App\Http\Controllers\ResidentController::class, 'store'])->middleware('role:admin');
@@ -34,10 +51,10 @@ Route::post('register', [AuthController::class, 'register']);
     Route::get('/account-requests', [App\Http\Controllers\UserController::class, 'account_request_view'])->middleware('role:admin');
     Route::post('/account-requests/approval/{id}', [App\Http\Controllers\UserController::class, 'account_approval'])->middleware('role:admin');
 
-    Route::get('/change-password', [App\Http\Controllers\UserController::class, 'change_password_view'])->middleware('role:admin');
-    Route::post('/change-password/{id}', [App\Http\Controllers\UserController::class, 'change_password'])->middleware('role:admin');
-    Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile_view'])->middleware('role:admin');
-    Route::post('/profile/{id}', [App\Http\Controllers\UserController::class, 'update_profile'])->middleware('role:admin');
+    Route::get('/change-password', [App\Http\Controllers\UserController::class, 'change_password_view'])->middleware('role:admin,user');
+    Route::post('/change-password/{id}', [App\Http\Controllers\UserController::class, 'change_password'])->middleware('role:admin,user');
+    Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile_view'])->middleware('role:admin,user');
+    Route::post('/profile/{id}', [App\Http\Controllers\UserController::class, 'update_profile'])->middleware('role:admin,user');
 
     Route::get('/complaint', [App\Http\Controllers\ComplaintController::class, 'index'])->middleware('role:admin,user');
     Route::get('/complaint/create', [App\Http\Controllers\ComplaintController::class, 'create'])->middleware('role:user');
