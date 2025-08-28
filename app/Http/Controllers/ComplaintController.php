@@ -53,6 +53,9 @@ class ComplaintController extends Controller
                 return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
             }
         $complaint = Complaint::findOrFail($id);
+         if ($complaint->status != 'new') {
+                return redirect('/complaint')->with('error', "Gagal mengubah Status aduan, Status anda saat ini adalah $complaint->status_label ");
+            }
         return view('pages.complaint.edit', [
             'complaint' => $complaint
         ]);
@@ -82,11 +85,11 @@ class ComplaintController extends Controller
             return redirect('/complaint')->with('error', 'Akun anda tidak Terhubung dengan Data Penduduk mana pun.');
             }
 
-        try {
             $complaint = Complaint::findOrFail($id);
             if ($complaint->status != 'new') {
                 return redirect('/complaint')->with('error', 'Gagal mengubah Status aduan, Status anda saat ini adalah "'. $complaint->status_label .'"');
             }
+
             $complaint->title = $request->input('title');
             $complaint->content = $request->input('content');
 
@@ -102,12 +105,6 @@ class ComplaintController extends Controller
 
             $complaint->save();
             return redirect('/complaint')->with('success', 'Berhasil mengubah Aduan');
-        }
-        catch (\Exception $e) {
-            return redirect()->back()
-            ->withInput()
-            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
     }
 
     public function update_status(Request $request, $id )
