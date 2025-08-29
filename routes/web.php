@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\RwController;
 
 
 // Define the routes for authentication and resident management
@@ -65,3 +66,11 @@ Route::post('register', [AuthController::class, 'register']);
     Route::get('/complaint/{id}', [App\Http\Controllers\ComplaintController::class, 'show'])->middleware('role:user');
     Route::post('/complaint/update-status/{id}', [App\Http\Controllers\ComplaintController::class, 'update_status'])->middleware('role:admin');
     Route::resource('complaint', ComplaintController::class)->middleware('auth');
+
+    Route::get('/rw-unit', [App\Http\Controllers\RwController::class, 'index'])->middleware('role:admin');
+    Route::get('/rw-unit/create', [App\Http\Controllers\RwController::class, 'create'])->middleware('role:admin');
+    Route::post('/rw-unit', [App\Http\Controllers\RwController::class, 'store'])->middleware('role:admin');
+    Route::get('/rw-unit/{id}/edit', [App\Http\Controllers\RwController::class, 'edit'])->middleware('role:admin');
+    Route::put('/rw-unit/{id}', [App\Http\Controllers\RwController::class, 'update'])->middleware('role:admin');
+    Route::delete('/rw-unit/{id}', [App\Http\Controllers\RwController::class, 'destroy'])->middleware('role:admin');
+    Route::get('/rw-unit/{id}', [App\Http\Controllers\RwController::class, 'show'])->middleware('role:admin');

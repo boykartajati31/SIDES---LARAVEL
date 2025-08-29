@@ -27,6 +27,11 @@
                             'path' => 'complaint',
                             'icon' => 'fas fa-fw fa-scroll',
                         ],
+                        (object)[
+                            'title' => 'Master RW',
+                            'path' => 'rw-unit',
+                            'icon' => 'fas fa-fw fa-tachometer-alt',
+                        ],
 
                     ],
 
